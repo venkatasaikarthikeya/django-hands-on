@@ -7,6 +7,8 @@ from django.forms.models import model_to_dict
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
+from products.serializers import ProductSerializer
+
 
 
 # json.loads(s) -> Deserialize ``s`` (a ``str``, ``bytes`` or ``bytearray`` instance containing a JSON document) to a Python object.
@@ -65,8 +67,13 @@ def api_home(request: HttpRequest, *args, **kwargs):
     # If we didn't have http_method_names on decorator, we might have to manually handle correct method checks as below
     # if request.method == "POST":
     #     return Response({"detail": "Method \"POST\" not allowed."}, status=405)
-    product = Product.objects.all().order_by("?").first()
+    """ product = Product.objects.all().order_by("?").first()
     data = {}
     if product:
-        data = model_to_dict(product)
+        # The property sale_price is not being returned. This is one of the places where Serializers can help. So, fields will only work for variables.
+        data = model_to_dict(product, fields=['id', 'title', 'content', 'price', 'sale_price']) """
+    instance = Product.objects.all().order_by("?").first()
+    data = {}
+    if instance:
+        data = ProductSerializer(instance).data
     return Response(data)
