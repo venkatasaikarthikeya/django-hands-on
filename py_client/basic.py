@@ -5,7 +5,7 @@ endpoint = 'http://127.0.0.1:8000/api/'
 request_json = {'Client Message': 'Hello Server!!'}
 
 #  http://127.0.0.1:8000/api/?abc=123
-request_params = {'abc': 123} # using this has same impact as above on the http request
+request_params = {'title': 'IPhone 13'} # using this has same impact as above on the http request
 
 response = requests.get(endpoint, params=request_params, json=request_json)
 
