@@ -12,10 +12,11 @@ from django.http import HttpRequest
 
 def api_home(request: HttpRequest, *args, **kwargs):
     body = request.body
-    print(request.GET)
+    params = request.GET
     data = {}
     try:
         data['body'] = json.loads(body)
+        data['params'] = dict(params)
     except:
         pass
     print(data.keys())
