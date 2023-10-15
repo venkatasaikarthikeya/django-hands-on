@@ -3,11 +3,14 @@ import requests
 endpoint = 'http://127.0.0.1:8000/api/'
 
 request_json = {'Client Message': 'Hello Server!!'}
-request_params = {'abc': 123}
+
+#  http://127.0.0.1:8000/api/?abc=123
+request_params = {'abc': 123} # using this has same impact as above on the http request
+
 response = requests.get(endpoint, params=request_params, json=request_json)
 
 text_response = response.text           # The response is directly converted into raw text
-print(response.text)
+# print(response.text)
 
 dict_response = response.json()         # The response is converted into Python dictionary
 print(dict_response)
