@@ -62,18 +62,31 @@ from products.serializers import ProductSerializer
 # @api_view's http_method_names is highly useful, in the sense that it doesn't allow requests of method types which are not in this list
 # Response is from rest_framework, it also takes a python dict as an argument and returns json
 
-@api_view(http_method_names=["GET"])
+# @api_view(http_method_names=["GET"])
+# def api_home(request: HttpRequest, *args, **kwargs):
+#     # If we didn't have http_method_names on decorator, we might have to manually handle correct method checks as below
+#     # if request.method == "POST":
+#     #     return Response({"detail": "Method \"POST\" not allowed."}, status=405)
+#     """ product = Product.objects.all().order_by("?").first()
+#     data = {}
+#     if product:
+#         # The property sale_price is not being returned. This is one of the places where Serializers can help. So, fields will only work for variables.
+#         data = model_to_dict(product, fields=['id', 'title', 'content', 'price', 'sale_price']) """
+#     instance = Product.objects.all().order_by("?").first()
+#     data = {}
+#     if instance:
+#         data = ProductSerializer(instance).data
+#     return Response(data)
+
+
+# Serializers can also take data in, clean it up and ensure that data is correct and right.
+# DRF doesn't require CSRF token to be set on a post request
+
+@api_view(http_method_names=["POST"])
 def api_home(request: HttpRequest, *args, **kwargs):
-    # If we didn't have http_method_names on decorator, we might have to manually handle correct method checks as below
-    # if request.method == "POST":
-    #     return Response({"detail": "Method \"POST\" not allowed."}, status=405)
-    """ product = Product.objects.all().order_by("?").first()
-    data = {}
-    if product:
-        # The property sale_price is not being returned. This is one of the places where Serializers can help. So, fields will only work for variables.
-        data = model_to_dict(product, fields=['id', 'title', 'content', 'price', 'sale_price']) """
-    instance = Product.objects.all().order_by("?").first()
-    data = {}
-    if instance:
+    serializer = ProductSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        instance = serializer.save()
         data = ProductSerializer(instance).data
-    return Response(data)
+        return Response(data)
+    return Response({"Invalid Request": "Not good data"}, status=400)

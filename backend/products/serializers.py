@@ -24,5 +24,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
     # obj is the actual instance of product that serializer is currently dealing with
     def get_my_discount(self, obj):
-        print(obj.id)
+        if not hasattr(obj, 'id'):
+            return None
+        if not isinstance(obj, Product):
+            return None
         return obj.get_discount()
