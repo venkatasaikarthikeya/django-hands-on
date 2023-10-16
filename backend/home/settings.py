@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework', # With this you will get an interactive gui to connect to your apis on browser
     'api',
     'products',
+    'todos',
 ]
 
 MIDDLEWARE = [
