@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework', # With this you will get an interactive gui to connect to your apis on browser
     'api',
     'products',
 ]
