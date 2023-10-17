@@ -9,6 +9,10 @@ from rest_framework.decorators import api_view
 
 from products.serializers import ProductSerializer
 
+from todos.models import Todo
+from todos.serializers import TodoSerializer
+
+from rest_framework.views import APIView
 
 
 # json.loads(s) -> Deserialize ``s`` (a ``str``, ``bytes`` or ``bytearray`` instance containing a JSON document) to a Python object.
@@ -90,3 +94,92 @@ def api_home(request: HttpRequest, *args, **kwargs):
         data = ProductSerializer(instance).data
         return Response(data)
     return Response({"Invalid Request": "Not good data"}, status=400)
+
+
+# Backend for todo application
+
+
+@api_view(http_method_names=['GET', 'POST', 'PUT', 'DELETE'])
+def api_todo(request: HttpRequest, *args, **kwargs):
+    if request.method == 'GET':
+        request_params = dict(request.GET)
+        if not request_params:
+            return Response({'Invalid Request': 'Params not found'}, status=400)
+        if 'id' in request_params.keys():
+            target_id = request_params['id'][0]
+            instance = Todo.objects.get(id=target_id)
+            if instance:
+                data = TodoSerializer(instance).data
+                return Response(data, status=200)
+        return Response({'Resource Error': 'The content you have requested for no longer exists'}, status=400)
+    # elif request.method == 'POST':
+
+    # elif request.method == 'PUT':
+
+    # elif request.method == 'DELETE':
+    # data = {}
+    # instance = Todo.objects.all().first()
+    # if instance:
+    #     # data = model_to_dict(instance, fields=['id', 'title', 'description', 'status', 'get_summary'])
+    #     data = TodoSerializer(instance).data
+    #     return Response(data, status=200)
+    # return Response({"Invalid Request": "Server Error"}, status=400)
+
+
+class TodoView(APIView):
+
+
+    def get(self, request: HttpRequest) -> Response:
+        request_params = dict(request.GET)
+        if not request_params:
+            return Response({'Invalid Request': 'Params not found'}, status=400)
+        if 'id' in request_params.keys():
+            target_id = request_params['id'][0]
+            instance = Todo.objects.get(id=target_id)
+            if instance:
+                data = TodoSerializer(instance).data
+                return Response(data, status=200)
+        return Response({'Resource Error': 'The content you have requested for no longer exists'}, status=400)
+    
+
+    def post(self, request: HttpRequest) -> Response:
+        request_body = request.data
+        serializer = TodoSerializer(data=request_body)
+        if serializer.is_valid(raise_exception=True):
+            instance = serializer.save()
+            data = TodoSerializer(instance).data
+            return Response(data, status=200)
+        return Response({"Server Error": "Invalid Request"}, status=400)
+    
+
+    def put(self, request: HttpRequest) -> Response:
+        request_body = request.data
+        updatable_todo = dict(request_body)
+        stored_instance = None
+        try:
+            stored_instance = Todo.objects.get(id=updatable_todo['id'])
+        except:
+            return Response({'Resource Error': 'The content you have requested for no longer exists'}, status=400)
+        serializer = TodoSerializer(stored_instance, data=request_body)
+        if serializer.is_valid(raise_exception=True):
+            updated_instance = serializer.save()
+            data = TodoSerializer(updated_instance).data
+            return Response(data, status=200)
+        return Response({'Server Error': 'Invalid Request'}, status=400)
+    
+
+    def delete(self, request: HttpRequest) -> Response:
+        request_params = dict(request.GET)
+        if not request_params:
+            return Response({'Invalid Request': 'Params not found'}, status=400)
+        if 'id' in request_params.keys():
+            target_id = request_params['id'][0]
+            instance = None
+            try:
+                instance = Todo.objects.get(id=target_id)
+                instance.delete()
+                return Response({'Success': 'Deleted!!'})
+            except:
+                return Response({'Resource Error': 'The content you have requested for no longer exists'}, status=400)
+
+
